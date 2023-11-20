@@ -45,6 +45,5 @@ public class CommandManager extends ListenerAdapter {
 
     public void add(CommandInterface command){
         commands.add(command);
-        System.out.println(commands);
     }
 }

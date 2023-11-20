@@ -52,11 +52,11 @@ public class Resume implements CommandInterface {
         }
 
         GuildMusicManager guildMusicManager = MusicListener.getInstance().getGuildMusicManager(event.getGuild());
-        if(!guildMusicManager.getScheduler().getPlayer().isPaused()){
-            guildMusicManager.getScheduler().getPlayer().setPaused(true);
+        if(guildMusicManager.getScheduler().getPlayer().isPaused()){
+            guildMusicManager.getScheduler().getPlayer().setPaused(false);
         }
-        else{
-            event.reply("이미 재생 중입니다").queue();
+        else {
+            event.reply("이미 재생 중입니다.").queue();
             return;
         }
         event.reply("일시정지를 해제합니다").queue();

@@ -58,6 +58,10 @@ public class Skip implements CommandInterface {
             //반복을 비활성화시켜 다음 곡으로 건너뛰기
             scheduler.setRepeat(false);
         }
+        if(scheduler.getPlayer().isPaused()){
+            //일시정지 해제
+            scheduler.getPlayer().setPaused(false);
+        }
         scheduler.stopTrack();
         event.reply("건너뛰기가 완료되었습니다").queue();
     }

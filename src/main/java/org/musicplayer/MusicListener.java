@@ -7,13 +7,19 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.awt.*;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MusicListener extends ListenerAdapter implements MusicLoadCallback {
+public class MusicListener extends ListenerAdapter {
     private static MusicListener INSTANCE;
     private final AudioPlayerManager playerManager;
     private final Map<Long, GuildMusicManager> musicManagers;
@@ -40,8 +46,8 @@ public class MusicListener extends ListenerAdapter implements MusicLoadCallback 
         });
     }
 
-    public void loadAndPlay(Guild guild, String trackUrl, MusicLoadCallback callback) {
-        GuildMusicManager musicManager = getGuildMusicManager(guild);
+    public void loadAndPlay(final TextChannel channel, final String trackUrl) {
+        GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
 
         playerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
@@ -51,6 +57,9 @@ public class MusicListener extends ListenerAdapter implements MusicLoadCallback 
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
+                channel.sendMessageEmbeds(new EmbedBuilder()
+                        .setDescription(playlist.getTracks().get(0).getInfo().title + " 이(가) 추가되었습니다")
+                        .setColor(Color.YELLOW).build()).queue();
                 musicManager.getScheduler().queue(playlist.getTracks().get(0));
             }
 
@@ -64,11 +73,5 @@ public class MusicListener extends ListenerAdapter implements MusicLoadCallback 
 
             }
         });
-        callback.onMusicLoadComplete();
-    }
-
-    @Override
-    public void onMusicLoadComplete() {
-
     }
 }

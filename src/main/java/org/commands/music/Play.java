@@ -1,16 +1,25 @@
 package org.commands.music;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.commands.CommandInterface;
+import org.jetbrains.annotations.NotNull;
 import org.musicplayer.MusicListener;
 
+import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Play implements CommandInterface {
@@ -56,7 +65,8 @@ public class Play implements CommandInterface {
             }
         }
 
-        String name = event.getOption("name").getAsString();
+        // name에 공백을 미리 추가해줘야 디스코드에서 노래 검색할 때 공백이 없어도 재생이 됨
+        String name = event.getOption("name").getAsString() + " ";
         try {
             new URI(name);
         }
@@ -65,7 +75,7 @@ public class Play implements CommandInterface {
         }
 
         MusicListener musicListener = MusicListener.getInstance();
-        musicListener.loadAndPlay(event.getGuild(), name, () ->  musicListener.getGuildMusicManager(event.getGuild()).getScheduler().showTrack(event));
+        musicListener.loadAndPlay((TextChannel) event.getChannel(), name);
+        event.reply("곡이 추가되었습니다").queue();
     }
-
 }

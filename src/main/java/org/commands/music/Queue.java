@@ -12,6 +12,7 @@ import org.musicplayer.GuildMusicManager;
 import org.musicplayer.MusicListener;
 
 import java.awt.*;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,13 +62,6 @@ public class Queue implements CommandInterface {
         List<AudioTrack> queue = new LinkedList<>(guildMusicManager.getScheduler().getQueue());
 
         AudioTrackInfo info = guildMusicManager.getScheduler().getPlayer().getPlayingTrack().getInfo();
-        Calendar now = Calendar.getInstance();
-        int amPm = now.get(Calendar.AM_PM);
-        String strAmPm = (amPm == Calendar.AM) ? "오전" : "오후";
-        int hour = now.get(Calendar.HOUR);
-        int minute = now.get(Calendar.MINUTE);
-        String formattedHour = String.format("%02d", hour);
-        String formattedMinute = String.format("%02d", minute);
 
         long trackLength = info.length;
         long trackHours = (trackLength / 1000) / 3600;
@@ -84,32 +78,26 @@ public class Queue implements CommandInterface {
                     + ":"  + String.format("%02d", trackSeconds);
         }
 
-
-
-        String sb = new StringBuilder()
-                .append(strAmPm)
-                .append(" ")
-                .append(formattedHour)
-                .append(":")
-                .append(formattedMinute)
-                .append(" / ")
-                .append(event.getMember().getEffectiveName())
-                .toString();
-
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor("현재 재생목록", null, event.getGuild().getIconUrl());
+        StringBuilder sb2 = new StringBuilder();
         if(queue.isEmpty()) {
             embedBuilder.setDescription("목록이 비어있습니다");
         }
-        for(int i = 0; i < queue.size(); i++) {
-            AudioTrackInfo info2 = queue.get(i).getInfo();
-            embedBuilder.addField("목록:", (i + 1) + ". " +
-                    info2.title +
-                    "[" + formattedTrackLength + "] " +
-                    info2.author , false);
+        else {
+            for(int i = 0; i < queue.size(); i++) {
+                AudioTrackInfo info2 = queue.get(i).getInfo();
+                sb2.append(i + 1)
+                        .append(". " + info2.title)
+                        .append(" [" + formattedTrackLength + "] ")
+                        .append("\n");
+            }
+            embedBuilder.setColor(Color.YELLOW)
+                    .addField("목록", String.valueOf(sb2), false)
+                    .setFooter(event.getMember().getEffectiveName())
+                    .setTimestamp(Instant.now());
+            event.replyEmbeds(embedBuilder.build()).queue();
         }
-        embedBuilder.setColor(Color.YELLOW)
-                    .setFooter(sb);
-        event.replyEmbeds(embedBuilder.build()).queue();
+
     }
 }

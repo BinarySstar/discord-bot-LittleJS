@@ -23,9 +23,6 @@ public class Main {
                 .build();
 
         CommandManager manager = new CommandManager();
-        jda.addEventListener(new MyListener());
-        // MusicListener musicListener = MusicListener.getInstance();
-        // jda.addEventListener(musicListener);
         manager.add(new Play());
         manager.add(new Skip());
         manager.add(new Nowplaying());

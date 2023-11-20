@@ -12,6 +12,7 @@ import org.commands.CommandInterface;
 import org.musicplayer.GuildMusicManager;
 import org.musicplayer.MusicListener;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +69,8 @@ public class Remove implements CommandInterface {
         int index = event.getOption("번호").getAsInt();
         AudioTrackInfo info = queue.get(index - 1).getInfo();
         guildMusicManager.getScheduler().getQueue().remove(index - 1);
-        embedBuilder.setDescription(info.title + "가 제거되었습니다");
+        embedBuilder.setColor(Color.YELLOW)
+                    .setDescription(info.title + " 가 제거되었습니다");
 
         event.replyEmbeds(embedBuilder.build()).queue();
     }

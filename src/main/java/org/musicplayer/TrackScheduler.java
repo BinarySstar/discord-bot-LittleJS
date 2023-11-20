@@ -6,11 +6,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+
 
 import java.awt.*;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.LinkedList;
 
 public class TrackScheduler extends AudioEventAdapter {
@@ -18,9 +19,27 @@ public class TrackScheduler extends AudioEventAdapter {
     private final LinkedList<AudioTrack> queue;
     private boolean isRepeat = false;
 
-    public TrackScheduler(AudioPlayer player) {
+    private final Guild guild;
+
+    public TrackScheduler(AudioPlayer player, Guild guild) {
         this.player = player;
         this.queue = new LinkedList<>();
+        this.guild = guild;
+    }
+
+    @Override
+    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        AudioTrackInfo trackInfo = track.getInfo();
+        TextChannel channel = (TextChannel) guild.getDefaultChannel();
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTitle(trackInfo.title)
+                .setAuthor(trackInfo.author, null, "https://cdn1.iconfinder.com/data/icons/music-instrument-vol-2/512/play_start_music_sound-512.png")
+                .setThumbnail(trackInfo.artworkUrl)
+                .setColor(Color.YELLOW)
+                .addField("길이", formatTrackLength(trackInfo.length), true)
+                .addField("링크", trackInfo.uri, true)
+                .setTimestamp(Instant.now());
+        channel.sendMessageEmbeds(embedBuilder.build()).queue();
     }
 
     @Override
@@ -60,57 +79,15 @@ public class TrackScheduler extends AudioEventAdapter {
         player.stopTrack();
     }
 
-    public void showTrack(@NotNull SlashCommandInteractionEvent event){
-        GuildMusicManager guildMusicManager = MusicListener.getInstance().getGuildMusicManager(event.getGuild());
-        if(guildMusicManager.getScheduler().getPlayer().getPlayingTrack() == null) {
-            event.reply("현재 재생되고 있는 노래가 없습니다!").queue();
-            return;
-        }
-        AudioTrackInfo info = guildMusicManager.getScheduler().getPlayer().getPlayingTrack().getInfo();
-
-        Calendar now = Calendar.getInstance();
-        int amPm = now.get(Calendar.AM_PM);
-        String strAmPm = (amPm == Calendar.AM) ? "오전" : "오후";
-        int hour = now.get(Calendar.HOUR);
-        int minute = now.get(Calendar.MINUTE);
-        String formattedHour = String.format("%02d", hour);
-        String formattedMinute = String.format("%02d", minute);
-
-        long trackLength = info.length;
+    private String formatTrackLength(long trackLength) {
         long trackHours = (trackLength / 1000) / 3600;
         long trackMinutes = ((trackLength / 1000) % 3600) / 60;
         long trackSeconds = (trackLength / 1000) % 60;
-        String formattedTrackLength = null;
-        if(trackHours < 1 ){
-            formattedTrackLength = String.format("%02d", trackMinutes)
-                    + ":" + String.format("%02d", trackSeconds);
+
+        if (trackHours < 1) {
+            return String.format("%02d:%02d", trackMinutes, trackSeconds);
+        } else {
+            return String.format("%02d:%02d:%02d", trackHours, trackMinutes, trackSeconds);
         }
-        else {
-            formattedTrackLength = String.format("%02d", trackHours)
-                    + ":" + String.format("%02d", trackMinutes)
-                    + ":"  + String.format("%02d", trackSeconds);
-        }
-
-
-
-        String sb = new StringBuilder()
-                .append(strAmPm)
-                .append(" ")
-                .append(formattedHour)
-                .append(":")
-                .append(formattedMinute)
-                .append(" / ")
-                .append(event.getMember().getEffectiveName())
-                .toString();
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setAuthor(info.author, null, "https://cdn1.iconfinder.com/data/icons/music-instrument-vol-2/512/play_start_music_sound-512.png")
-                .setTitle(info.title)
-                .setThumbnail(info.artworkUrl)
-                .setColor(Color.YELLOW)
-                .addField("길이", formattedTrackLength, true)
-                .addField("링크", info.uri, true)
-                .setFooter(sb);
-
-        event.replyEmbeds(embedBuilder.build()).queue();
     }
 }
