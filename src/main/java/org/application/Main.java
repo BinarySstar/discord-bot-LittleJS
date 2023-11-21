@@ -1,17 +1,14 @@
-package org.example;
+package org.application;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.commands.CommandManager;
-import org.commands.application.Exit;
 import org.commands.music.*;
 
-import javax.security.auth.login.LoginException;
-
 public class Main {
-    public static void main(String[] args) throws LoginException, InterruptedException {
+    public static void main(String[] args) {
         if(args.length < 1){
             System.out.println("명령 인수에 token 값이 있어야 합니다!");
             return;
@@ -30,7 +27,6 @@ public class Main {
         manager.add(new Repeat());
         manager.add(new Pause());
         manager.add(new Resume());
-        manager.add(new Exit());
         manager.add(new Remove());
         jda.addEventListener(manager);
     }

@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface CommandInterface {
     String getCommandName();
+
     String getCommandDescription();
 
     List<OptionData> getCommandOptions();

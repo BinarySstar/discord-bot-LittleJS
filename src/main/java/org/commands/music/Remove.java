@@ -62,6 +62,7 @@ public class Remove implements CommandInterface {
 
         GuildMusicManager guildMusicManager = MusicListener.getInstance().getGuildMusicManager(event.getGuild());
         List<AudioTrack> queue = new LinkedList<>(guildMusicManager.getScheduler().getQueue());
+
         EmbedBuilder embedBuilder = new EmbedBuilder();
         if(queue.isEmpty()) {
             embedBuilder.setDescription("목록이 비어있습니다");

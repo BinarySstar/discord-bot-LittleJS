@@ -30,7 +30,6 @@ public class CommandManager extends ListenerAdapter {
                 }
             }
         }
-        return;
     }
 
     @Override
