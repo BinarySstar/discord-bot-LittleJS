@@ -1,11 +1,10 @@
-package org.example;
+package org.application;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.commands.CommandManager;
-import org.commands.application.Exit;
 import org.commands.music.*;
 
 import javax.security.auth.login.LoginException;
@@ -30,8 +29,6 @@ public class Main {
         manager.add(new Repeat());
         manager.add(new Pause());
         manager.add(new Resume());
-        manager.add(new Exit());
-        manager.add(new Remove());
         jda.addEventListener(manager);
     }
 }
