@@ -62,17 +62,23 @@ public class Remove implements CommandInterface {
 
         GuildMusicManager guildMusicManager = MusicListener.getInstance().getGuildMusicManager(event.getGuild());
         List<AudioTrack> queue = new LinkedList<>(guildMusicManager.getScheduler().getQueue());
-
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        if(queue.isEmpty()) {
-            embedBuilder.setDescription("목록이 비어있습니다");
-        }
         int index = event.getOption("번호").getAsInt();
-        AudioTrackInfo info = queue.get(index - 1).getInfo();
-        guildMusicManager.getScheduler().getQueue().remove(index - 1);
-        embedBuilder.setColor(Color.YELLOW)
-                    .setDescription(info.title + " 가 제거되었습니다");
+        EmbedBuilder embedBuilder = new EmbedBuilder();
 
+        if(queue.isEmpty()) {
+            embedBuilder.setDescription("목록이 비어있습니다")
+                    .setColor(Color.YELLOW);
+        }
+        else if(index < queue.size()){
+            AudioTrackInfo info = queue.get(index - 1).getInfo();
+            guildMusicManager.getScheduler().getQueue().remove(index - 1);
+            embedBuilder.setColor(Color.YELLOW)
+                    .setDescription(info.title + " 가 제거되었습니다");
+        }
+        else{
+            embedBuilder.setDescription("유효하지 않는 번호입니다.")
+                    .setColor(Color.YELLOW);
+        }
         event.replyEmbeds(embedBuilder.build()).queue();
     }
 }
